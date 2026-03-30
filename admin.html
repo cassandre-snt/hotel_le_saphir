@@ -61,7 +61,7 @@
 <body class="bg-gray-100 text-gray-800 font-sans">
 
     <!-- ========================================== -->
-    <!-- MODALE : FICHE CLIENT (S'affiche au clic) -->
+    <!-- MODALE : FICHE CLIENT (S'affiche au clic ou via recherche) -->
     <!-- ========================================== -->
     <div id="clientModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
         <!-- Overlay flou -->
@@ -172,7 +172,8 @@
             <div class="flex items-center space-x-6">
                 <div class="relative hidden lg:block">
                     <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                    <input type="text" placeholder="Rechercher un client..." class="bg-gray-100 border-none rounded-full py-2 pl-10 pr-4 text-xs focus:ring-1 focus:ring-gold outline-none w-64 transition-all">
+                    <!-- ID "searchInput" ajouté ici -->
+                    <input id="searchInput" type="text" placeholder="Rechercher un client (Julian, Elena...)" class="bg-gray-100 border-none rounded-full py-2 pl-10 pr-4 text-xs focus:ring-1 focus:ring-gold outline-none w-64 transition-all">
                 </div>
                 <button class="relative text-saphir">
                     <i class="fa-solid fa-bell text-xl"></i>
@@ -180,10 +181,10 @@
                 </button>
                 <div class="flex items-center space-x-3 border-l pl-6 border-gray-200">
                     <div class="text-right hidden sm:block">
-                        <p class="text-xs font-bold text-saphir uppercase tracking-tighter">Jean-Sébastien</p>
-                        <p class="text-[10px] text-gold font-medium uppercase">Directeur de Nuit</p>
+                        <p class="text-xs font-bold text-saphir uppercase tracking-tighter">Cassandre Sanita</p>
+                        <p class="text-[10px] text-gold font-medium uppercase">Directrice</p>
                     </div>
-                    <img class="h-10 w-10 rounded-full object-cover ring-2 ring-gold/20" src="https://ui-avatars.com/api/?name=JS+Palace&background=0a1128&color=c5a059" alt="Profile">
+                    <img class="h-10 w-10 rounded-full object-cover ring-2 ring-gold/20" src="https://ui-avatars.com/api/?name=CS+Salace&background=0a1128&color=c5a059" alt="Profile">
                 </div>
             </div>
         </header>
@@ -253,7 +254,7 @@
                     <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
                         <div class="p-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
                             <h3 class="font-serif text-lg text-saphir">Dernières <span class="italic-accent">Arrivées</span></h3>
-                            <p class="text-[10px] text-gray-400 italic">Cliquez sur une ligne pour voir le profil</p>
+                            <p class="text-[10px] text-gray-400 italic">Cliquez sur une ligne ou recherchez un nom pour voir le profil</p>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse">
@@ -262,7 +263,7 @@
                                         <th class="px-6 py-4 font-semibold">Client</th>
                                         <th class="px-6 py-4 font-semibold">Résidence</th>
                                         <th class="px-6 py-4 font-semibold">Date</th>
-                                        <th class="px-6 py-4 font-semibold text-center">Statut</th>
+                                        <th class="px-6 py-4 text-center">Statut</th>
                                     </tr>
                                 </thead>
                                 <tbody class="text-sm divide-y divide-gray-50">
@@ -300,7 +301,7 @@
                             </table>
                         </div>
                     </div>
-                   
+                </div>
             </section>
 
             <!-- SECTION 2 : RÉSIDENCES -->
@@ -322,11 +323,58 @@
 
             <!-- SECTION 3 : RÉSERVATIONS -->
             <section id="section-reservations" class="content-section">
-                <div class="bg-white p-10 rounded-2xl shadow-sm text-center border border-gray-100">
-                    <i class="fa-solid fa-calendar-days text-4xl text-gold/30 mb-4"></i>
-                    <h3 class="font-serif text-xl text-saphir mb-2">Registre Central</h3>
-                    <p class="text-sm text-gray-400 mb-6 max-w-md mx-auto">Accédez à l'historique complet des séjours et gérez les réservations futures du Palace.</p>
-                    <button class="bg-saphir text-white px-8 py-3 rounded-lg text-xs uppercase font-bold tracking-widest shadow-lg shadow-saphir/20">Ouvrir le calendrier</button>
+                <div class="flex flex-col space-y-8">
+                    
+                    <!-- État des Suites Signatures -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-saphir-dark p-6 rounded-2xl border border-gold/30 text-white shadow-xl">
+                            <div class="flex justify-between items-center mb-4">
+                                <h4 class="font-serif text-gold italic-accent text-lg">The Royalty</h4>
+                                <span class="text-[9px] bg-red-500/20 text-red-400 px-2 py-1 rounded border border-red-500/50 uppercase font-bold tracking-widest">Occupée</span>
+                            </div>
+                            <p class="text-[10px] text-gray-400 uppercase mb-1 tracking-widest">Libre à partir du :</p>
+                            <p class="text-lg font-medium text-white">02 Avril 2024</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                            <div class="flex justify-between items-center mb-4">
+                                <h4 class="font-serif text-saphir italic-accent text-lg">Ocean Beauty</h4>
+                                <span class="text-[9px] bg-amber-500/20 text-amber-600 px-2 py-1 rounded border border-amber-500/50 uppercase font-bold tracking-widest">Fin de séjour</span>
+                            </div>
+                            <p class="text-[10px] text-gray-400 uppercase mb-1 tracking-widest">Libre à partir du :</p>
+                            <p class="text-lg font-medium text-saphir">31 Mars 2024</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                            <div class="flex justify-between items-center mb-4">
+                                <h4 class="font-serif text-saphir italic-accent text-lg">Origin Suite</h4>
+                                <span class="text-[9px] bg-green-500/20 text-green-600 px-2 py-1 rounded border border-green-500/50 uppercase font-bold tracking-widest">Disponible</span>
+                            </div>
+                            <p class="text-[10px] text-gray-400 uppercase mb-1 tracking-widest">Libre à partir du :</p>
+                            <p class="text-lg font-medium text-green-600 italic">Immédiatement</p>
+                        </div>
+                    </div>
+
+                    <!-- Registre Complet -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="p-6 bg-gray-50/50 border-b border-gray-100 flex justify-between items-center">
+                            <h3 class="font-serif text-xl text-saphir italic-accent tracking-wide">Planning Global des Séjours</h3>
+                            <button class="bg-gold text-white text-[10px] font-bold px-6 py-2 rounded-full uppercase tracking-widest shadow-lg shadow-gold/20 hover:bg-gold-dark transition-all">Nouvelle Réservation</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead class="text-[10px] uppercase tracking-[0.2em] text-gray-400 border-b border-gray-100">
+                                    <tr>
+                                        <th class="px-6 py-4 font-semibold">Résidence</th>
+                                        <th class="px-6 py-4 font-semibold">Client Principal</th>
+                                        <th class="px-6 py-4 font-semibold">Période du Séjour</th>
+                                        <th class="px-6 py-4 font-semibold text-center">Disponibilité Future</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reservations-table-body" class="text-sm divide-y divide-gray-50">
+                                    <!-- Généré dynamiquement par JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -360,24 +408,86 @@
 
     <!-- SCRIPTS -->
     <script>
+        // --- DONNÉES SIMULÉES ---
+        const reservationsList = [
+            { suite: "The Royalty Signature", guest: "Julian De Silva", start: "28 Mars", end: "02 Avril", phone: "+33 09.45.46.37", email: "j.desilva@prestige.com", status: "Occupé" },
+            { suite: "Ocean Beauty Suite", guest: "Elena Markov", start: "29 Mars", end: "31 Mars", phone: "+44 20 7946 0958", email: "e.markov@residence.ru", status: "Fin de séjour" },
+            { suite: "Origin Suite #102", guest: "Hans Lehmann", start: "30 Mars", end: "05 Avril", phone: "+49 157 39201", email: "hans@lehmann.de", status: "Occupé" },
+            { suite: "Penthouse Saphir", guest: "Libre", start: "-", end: "-", phone: "-", email: "-", status: "Libre" }
+        ];
+
+        // --- GÉNÉRER LE REGISTRE DES RÉSERVATIONS ---
+        function renderReservationsTable() {
+            const tableBody = document.getElementById('reservations-table-body');
+            tableBody.innerHTML = '';
+
+            reservationsList.forEach(res => {
+                const isLibre = res.guest === "Libre";
+                const row = document.createElement('tr');
+                row.className = "hover:bg-gold/5 transition cursor-pointer group";
+                
+                if (!isLibre) {
+                    row.onclick = () => openClientCardFromData(res);
+                }
+
+                row.innerHTML = `
+                    <td class="px-6 py-4 font-serif text-saphir italic-accent text-base group-hover:text-gold transition">${res.suite}</td>
+                    <td class="px-6 py-4">
+                        <span class="${isLibre ? 'text-gray-300 italic' : 'font-medium text-saphir'}">${res.guest}</span>
+                    </td>
+                    <td class="px-6 py-4 text-xs text-gray-400 font-medium">
+                        ${res.start} <i class="fa-solid fa-arrow-right mx-2 text-[10px] text-gold"></i> ${res.end}
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter 
+                        ${isLibre ? 'bg-green-100 text-green-700' : 'bg-saphir-dark text-gold border border-gold/20'}">
+                            ${isLibre ? 'Immédiat' : 'Libre le ' + res.end}
+                        </span>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // --- LOGIQUE DE RECHERCHE DANS LE HEADER ---
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                const searchTerm = e.target.value.toLowerCase().trim();
+                if (searchTerm === "") return;
+
+                // On cherche le client dans la liste (ignorer "Libre")
+                const foundClient = reservationsList.find(c => 
+                    c.guest !== "Libre" && c.guest.toLowerCase().includes(searchTerm)
+                );
+
+                if (foundClient) {
+                    openClientCardFromData(foundClient);
+                    e.target.value = ""; // Vider la barre après succès
+                } else {
+                    alert("Aucun client trouvé pour : " + e.target.value);
+                }
+            }
+        });
+
         // --- LOGIQUE DE LA FICHE CLIENT (MODALE) ---
         function openClientCard(rowElement) {
-            // Extraire les données de la ligne cliquée
-            const firstname = rowElement.dataset.firstname;
-            const lastname = rowElement.dataset.lastname;
-            const suite = rowElement.dataset.suite;
-            const phone = rowElement.dataset.phone;
-            const email = rowElement.dataset.email;
+            const d = rowElement.dataset;
+            openClientCardFromData({
+                guest: d.firstname + " " + d.lastname,
+                suite: d.suite,
+                phone: d.phone,
+                email: d.email
+            });
+        }
 
-            // Remplir les champs de la modale
-            document.getElementById('m-full-name').innerText = firstname + " " + lastname;
-            document.getElementById('m-firstname').innerText = firstname;
-            document.getElementById('m-lastname').innerText = lastname;
-            document.getElementById('m-suite').innerText = suite;
-            document.getElementById('m-phone').innerText = phone;
-            document.getElementById('m-email').innerText = email;
-
-            // Afficher la modale
+        function openClientCardFromData(data) {
+            document.getElementById('m-full-name').innerText = data.guest;
+            document.getElementById('m-firstname').innerText = data.guest.split(' ')[0];
+            document.getElementById('m-lastname').innerText = data.guest.split(' ')[1] || "";
+            document.getElementById('m-suite').innerText = data.suite;
+            document.getElementById('m-phone').innerText = data.phone;
+            document.getElementById('m-email').innerText = data.email;
             document.getElementById('clientModal').classList.remove('hidden');
         }
 
@@ -387,22 +497,17 @@
 
         // --- LOGIQUE DE NAVIGATION (SPA) ---
         function switchSection(sectionName, element) {
-            // Cacher toutes les sections
             document.querySelectorAll('.content-section').forEach(section => {
                 section.classList.remove('active');
             });
-            
-            // Afficher la section demandée
             const targetSection = document.getElementById('section-' + sectionName);
             if(targetSection) targetSection.classList.add('active');
 
-            // Gérer le style actif du menu
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('active');
             });
             element.classList.add('active');
 
-            // Mettre à jour le titre du Header
             const sectionTitles = {
                 'overview': 'Conciergerie',
                 'residences': 'Gestion des Résidences',
@@ -411,7 +516,7 @@
             };
             document.getElementById('current-page-title').innerText = sectionTitles[sectionName];
 
-            // Fermer la sidebar sur mobile
+            if(sectionName === 'reservations') renderReservationsTable();
             if(window.innerWidth < 768) toggleSidebar();
         }
 
@@ -419,44 +524,15 @@
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebarOverlay');
         const openBtn = document.getElementById('openSidebar');
-        
         function toggleSidebar() {
             sidebar.classList.toggle('sidebar-hidden');
             overlay.classList.toggle('hidden');
         }
-
         openBtn.addEventListener('click', toggleSidebar);
         overlay.addEventListener('click', toggleSidebar);
 
-        // --- INITIALISATION DU GRAPHIQUE ---
-        const ctx = document.getElementById('saphirChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
-                datasets: [{
-                    label: 'Arrivées',
-                    data: [12, 19, 14, 25, 22, 30, 28],
-                    borderColor: '#c5a059',
-                    backgroundColor: 'rgba(197, 160, 89, 0.05)',
-                    fill: true,
-                    tension: 0.4,
-                    borderWidth: 2,
-                    pointRadius: 4,
-                    pointBackgroundColor: '#0a1128',
-                    pointBorderColor: '#c5a059'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    x: { grid: { display: false }, ticks: { font: { size: 9 }, color: '#94a3b8' } },
-                    y: { display: false }
-                }
-            }
-        });
+        // Initialisation
+        renderReservationsTable();
     </script>
 </body>
 </html>
