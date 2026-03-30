@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le Saphir | Tableau de Bord Admin</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Playfair Display & Montserrat -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        saphir: {
+                            dark: '#0a1128', // Bleu Saphir profond
+                            DEFAULT: '#1a2a4d',
+                            light: '#243b6b'
+                        },
+                        gold: {
+                            light: '#e2c792',
+                            DEFAULT: '#c5a059', // Or signature
+                            dark: '#a6833d'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .sidebar-transition { transition: all 0.3s ease-in-out; }
+        @media (max-width: 768px) { .sidebar-hidden { transform: translateX(-100%); } }
+        .italic-accent { font-family: 'Playfair Display', serif; font-style: italic; }
+        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        
+        /* Gestion des sections */
+        .content-section { display: none; }
+        .content-section.active { display: block; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Style bouton actif sidebar */
+        .nav-item.active { background-color: rgba(197, 160, 89, 0.15); color: #c5a059; border-left: 4px solid #c5a059; }
+
+        /* Animation Fiche Client */
+        #clientModal.hidden { display: none; }
+        #clientModal:not(.hidden) { display: flex; animation: modalFadeIn 0.3s ease forwards; }
+        @keyframes modalFadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans">
+
+    <!-- ========================================== -->
+    <!-- MODALE : FICHE CLIENT (S'affiche au clic) -->
+    <!-- ========================================== -->
+    <div id="clientModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+        <!-- Overlay flou -->
+        <div class="absolute inset-0 bg-saphir-dark/80 backdrop-blur-md" onclick="closeClientCard()"></div>
+        
+        <!-- Contenu de la fiche -->
+        <div class="relative bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden border border-gold/30 transform transition-all">
+            <!-- En-tête de la fiche -->
+            <div class="bg-saphir-dark p-8 text-center border-b border-gold/30">
+                <div class="w-20 h-20 bg-gold/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-gold/20">
+                    <i class="fa-solid fa-user-tie text-gold text-3xl"></i>
+                </div>
+                <h3 id="m-full-name" class="font-serif text-2xl text-gold italic-accent">Prénom Nom</h3>
+                <p class="text-[10px] uppercase tracking-[0.3em] text-gold/50 mt-1">Client Privilège Le Saphir</p>
+            </div>
+
+            <!-- Détails de la fiche -->
+            <div class="p-8 space-y-6">
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <label class="text-[10px] uppercase font-bold text-gray-400 block mb-1">Prénom</label>
+                        <p id="m-firstname" class="text-sm font-semibold text-saphir">-</p>
+                    </div>
+                    <div>
+                        <label class="text-[10px] uppercase font-bold text-gray-400 block mb-1">Nom de famille</label>
+                        <p id="m-lastname" class="text-sm font-semibold text-saphir">-</p>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-gray-50">
+                    <label class="text-[10px] uppercase font-bold text-gray-400 block mb-1">Résidence Actuelle</label>
+                    <p id="m-suite" class="text-lg font-serif italic-accent text-gold">-</p>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4 pt-4 border-t border-gray-50">
+                    <div class="flex items-center space-x-4">
+                        <i class="fa-solid fa-phone text-gold text-sm w-5"></i>
+                        <div>
+                            <label class="text-[9px] uppercase font-bold text-gray-400 block">Téléphone</label>
+                            <p id="m-phone" class="text-sm text-saphir font-medium">-</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <i class="fa-solid fa-envelope text-gold text-sm w-5"></i>
+                        <div>
+                            <label class="text-[9px] uppercase font-bold text-gray-400 block">Email</label>
+                            <p id="m-email" class="text-sm text-saphir font-medium">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bouton Fermer -->
+            <div class="p-6 bg-gray-50 text-center">
+                <button onclick="closeClientCard()" class="bg-saphir text-gold border border-gold/30 px-8 py-3 rounded-full text-[10px] font-bold uppercase tracking-widest hover:bg-gold hover:text-white transition-all">
+                    Fermer la fiche
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Overlay (Sidebar) -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden md:hidden"></div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="fixed left-0 top-0 h-full w-72 bg-saphir-dark text-white z-30 sidebar-transition sidebar-hidden md:translate-x-0 border-r border-gold/20">
+        <div class="p-8">
+            <div class="mb-10 text-center">
+                <h1 class="font-serif text-2xl tracking-widest uppercase text-gold">Le Saphir</h1>
+                <p class="text-[10px] uppercase tracking-[0.3em] text-gold/60 mt-1">Administration Palace</p>
+            </div>
+
+            <nav class="space-y-2">
+                <button onclick="switchSection('overview', this)" class="nav-item active w-full flex items-center space-x-4 p-3 rounded text-gray-400 hover:text-gold hover:bg-white/5 transition">
+                    <i class="fa-solid fa-gauge-high w-5"></i>
+                    <span class="text-sm font-medium uppercase tracking-wider">Vue d'ensemble</span>
+                </button>
+                <button onclick="switchSection('residences', this)" class="nav-item w-full flex items-center space-x-4 p-3 rounded text-gray-400 hover:text-gold hover:bg-white/5 transition">
+                    <i class="fa-solid fa-bed w-5"></i>
+                    <span class="text-sm font-medium uppercase tracking-wider">Résidences</span>
+                </button>
+                <button onclick="switchSection('reservations', this)" class="nav-item w-full flex items-center space-x-4 p-3 rounded text-gray-400 hover:text-gold hover:bg-white/5 transition">
+                    <i class="fa-solid fa-calendar-check w-5"></i>
+                    <span class="text-sm font-medium uppercase tracking-wider">Réservations</span>
+                </button>
+                <div class="pt-8 mt-8 border-t border-white/10">
+                    <button onclick="switchSection('settings', this)" class="nav-item w-full flex items-center space-x-4 p-3 rounded text-gray-400 hover:text-gold transition">
+                        <i class="fa-solid fa-gear w-5"></i>
+                        <span class="text-sm font-medium uppercase tracking-wider">Paramètres</span>
+                    </button>
+                </div>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="md:ml-72 min-h-screen flex flex-col">
+        
+        <!-- HEADER -->
+        <header class="h-20 glass border-b border-gray-200 flex items-center justify-between px-8 sticky top-0 z-10">
+            <div class="flex items-center">
+                <button id="openSidebar" class="md:hidden mr-4 text-saphir focus:outline-none">
+                    <i class="fa-solid fa-bars-staggered text-2xl"></i>
+                </button>
+                <h2 class="font-serif text-xl text-saphir leading-none">Bonjour, <span class="italic-accent" id="current-page-title">Conciergerie</span></h2>
+            </div>
+
+            <div class="flex items-center space-x-6">
+                <div class="relative hidden lg:block">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                    <input type="text" placeholder="Rechercher un client..." class="bg-gray-100 border-none rounded-full py-2 pl-10 pr-4 text-xs focus:ring-1 focus:ring-gold outline-none w-64 transition-all">
+                </div>
+                <button class="relative text-saphir">
+                    <i class="fa-solid fa-bell text-xl"></i>
+                    <span class="absolute -top-1 -right-1 bg-gold text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white">3</span>
+                </button>
+                <div class="flex items-center space-x-3 border-l pl-6 border-gray-200">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-xs font-bold text-saphir uppercase tracking-tighter">Jean-Sébastien</p>
+                        <p class="text-[10px] text-gold font-medium uppercase">Directeur de Nuit</p>
+                    </div>
+                    <img class="h-10 w-10 rounded-full object-cover ring-2 ring-gold/20" src="https://ui-avatars.com/api/?name=JS+Palace&background=0a1128&color=c5a059" alt="Profile">
+                </div>
+            </div>
+        </header>
+
+        <!-- DASHBOARD BODY -->
+        <main class="p-8 flex-1">
+
+            <!-- SECTION 1 : VUE D'ENSEMBLE -->
+            <section id="section-overview" class="content-section active">
+                <!-- STATS GRID -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-b-4 border-gold group">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1">Taux de réservation</p>
+                                <h3 class="text-2xl font-serif text-saphir">80%</h3>
+                            </div>
+                            <div class="p-3 bg-gold/10 text-gold rounded-lg">
+                                <i class="fa-solid fa-vault text-xl"></i>
+                            </div>
+                        </div>
+                        <p class="text-[11px] mt-4 text-green-600 font-bold uppercase"><i class="fa-solid fa-arrow-up mr-1"></i> 14% ce mois</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-b-4 border-saphir group">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1">Taux d'Occupation</p>
+                                <h3 class="text-2xl font-serif text-saphir">92%</h3>
+                            </div>
+                            <div class="p-3 bg-saphir/10 text-saphir rounded-lg">
+                                <i class="fa-solid fa-key text-xl"></i>
+                            </div>
+                        </div>
+                        <p class="text-[11px] mt-4 text-blue-600 font-bold uppercase">Période de Haute Saison</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-b-4 border-gold group">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1">Nouvelles Demandes</p>
+                                <h3 class="text-2xl font-serif text-saphir">24</h3>
+                            </div>
+                            <div class="p-3 bg-gold/10 text-gold rounded-lg">
+                                <i class="fa-solid fa-envelope-open-text text-xl"></i>
+                            </div>
+                        </div>
+                        <p class="text-[11px] mt-4 text-amber-600 font-bold uppercase">8 en attente</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-b-4 border-saphir group">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1">Satisfaction</p>
+                                <h3 class="text-2xl font-serif text-saphir">4.9/5</h3>
+                            </div>
+                            <div class="p-3 bg-saphir/10 text-saphir rounded-lg">
+                                <i class="fa-solid fa-star text-xl"></i>
+                            </div>
+                        </div>
+                        <p class="text-[11px] mt-4 text-green-600 font-bold uppercase">Excellent (340 avis)</p>
+                    </div>
+                </div>
+
+                <!-- TABLEAU DES ARRIVÉES -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+                        <div class="p-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+                            <h3 class="font-serif text-lg text-saphir">Dernières <span class="italic-accent">Arrivées</span></h3>
+                            <p class="text-[10px] text-gray-400 italic">Cliquez sur une ligne pour voir le profil</p>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="text-[10px] uppercase tracking-widest text-gray-400 border-b border-gray-100">
+                                        <th class="px-6 py-4 font-semibold">Client</th>
+                                        <th class="px-6 py-4 font-semibold">Résidence</th>
+                                        <th class="px-6 py-4 font-semibold">Date</th>
+                                        <th class="px-6 py-4 font-semibold text-center">Statut</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-sm divide-y divide-gray-50">
+                                    <!-- LIGNE CLIENT 1 -->
+                                    <tr class="hover:bg-gold/5 transition cursor-pointer group" 
+                                        onclick="openClientCard(this)"
+                                        data-firstname="Julian" 
+                                        data-lastname="De Silva"
+                                        data-suite="The Royalty Signature"
+                                        data-phone="+33 09.45.46.37"
+                                        data-email="j.desilva@prestige-travel.com">
+                                        <td class="px-6 py-4 font-medium text-saphir group-hover:text-gold transition">Julian De Silva</td>
+                                        <td class="px-6 py-4 italic-accent text-gold">The Royalty</td>
+                                        <td class="px-6 py-4 text-xs text-gray-400 uppercase tracking-tighter">28 Mar - 02 Avr</td>
+                                        <td class="px-6 py-4 text-center">
+                                            <span class="px-2 py-1 text-[9px] font-bold bg-green-100 text-green-700 rounded-full uppercase">Confirmé</span>
+                                        </td>
+                                    </tr>
+                                    <!-- LIGNE CLIENT 2 -->
+                                    <tr class="hover:bg-gold/5 transition cursor-pointer group" 
+                                        onclick="openClientCard(this)"
+                                        data-firstname="Elena" 
+                                        data-lastname="Markov"
+                                        data-suite="Ocean Beauty Suite"
+                                        data-phone="+44 20 7946 0958"
+                                        data-email="e.markov@residence.ru">
+                                        <td class="px-6 py-4 font-medium text-saphir group-hover:text-gold transition">Elena Markov</td>
+                                        <td class="px-6 py-4 italic-accent text-gold">Ocean Beauty</td>
+                                        <td class="px-6 py-4 text-xs text-gray-400 uppercase tracking-tighter">29 Mar - 31 Mar</td>
+                                        <td class="px-6 py-4 text-center">
+                                            <span class="px-2 py-1 text-[9px] font-bold bg-amber-100 text-amber-700 rounded-full uppercase">En attente</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                   
+            </section>
+
+            <!-- SECTION 2 : RÉSIDENCES -->
+            <section id="section-residences" class="content-section">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white rounded-xl overflow-hidden shadow-sm border border-gold/20">
+                        <img src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=400" class="w-full h-40 object-cover">
+                        <div class="p-4">
+                            <h4 class="font-serif text-saphir text-lg">The Royalty Signature</h4>
+                            <p class="text-xs text-gray-400 uppercase tracking-widest mb-4">Suite Impériale</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-green-600 text-[10px] font-bold uppercase">Disponible</span>
+                                <button class="text-gold text-xs font-bold border border-gold px-3 py-1 rounded hover:bg-gold hover:text-white transition">Gérer</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 3 : RÉSERVATIONS -->
+            <section id="section-reservations" class="content-section">
+                <div class="bg-white p-10 rounded-2xl shadow-sm text-center border border-gray-100">
+                    <i class="fa-solid fa-calendar-days text-4xl text-gold/30 mb-4"></i>
+                    <h3 class="font-serif text-xl text-saphir mb-2">Registre Central</h3>
+                    <p class="text-sm text-gray-400 mb-6 max-w-md mx-auto">Accédez à l'historique complet des séjours et gérez les réservations futures du Palace.</p>
+                    <button class="bg-saphir text-white px-8 py-3 rounded-lg text-xs uppercase font-bold tracking-widest shadow-lg shadow-saphir/20">Ouvrir le calendrier</button>
+                </div>
+            </section>
+
+            <!-- SECTION 4 : PARAMÈTRES -->
+            <section id="section-settings" class="content-section">
+                <div class="max-w-xl bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="font-serif text-xl text-saphir mb-6 tracking-wide">Configuration du Système</h3>
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-[10px] uppercase font-bold text-gray-400 mb-2 tracking-widest">Nom de l'Établissement</label>
+                            <input type="text" value="Le Saphir Palace & Spa" class="w-full border-b border-gray-200 py-2 outline-none focus:border-gold text-sm font-medium transition">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] uppercase font-bold text-gray-400 mb-2 tracking-widest">Langue de l'Interface</label>
+                            <select class="w-full border-b border-gray-200 py-2 outline-none focus:border-gold text-sm bg-transparent">
+                                <option>Français (FR)</option>
+                                <option>English (UK)</option>
+                            </select>
+                        </div>
+                        <button class="bg-gold text-white text-[10px] font-bold px-10 py-4 rounded-full uppercase tracking-widest shadow-lg shadow-gold/20 hover:bg-gold-dark transition-all">Enregistrer les réglages</button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="p-8 text-center text-[10px] uppercase tracking-[0.2em] text-gray-400">
+            &copy; 2024 Le Saphir Palace - Système de Gestion Propriétaire
+        </footer>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script>
+        // --- LOGIQUE DE LA FICHE CLIENT (MODALE) ---
+        function openClientCard(rowElement) {
+            // Extraire les données de la ligne cliquée
+            const firstname = rowElement.dataset.firstname;
+            const lastname = rowElement.dataset.lastname;
+            const suite = rowElement.dataset.suite;
+            const phone = rowElement.dataset.phone;
+            const email = rowElement.dataset.email;
+
+            // Remplir les champs de la modale
+            document.getElementById('m-full-name').innerText = firstname + " " + lastname;
+            document.getElementById('m-firstname').innerText = firstname;
+            document.getElementById('m-lastname').innerText = lastname;
+            document.getElementById('m-suite').innerText = suite;
+            document.getElementById('m-phone').innerText = phone;
+            document.getElementById('m-email').innerText = email;
+
+            // Afficher la modale
+            document.getElementById('clientModal').classList.remove('hidden');
+        }
+
+        function closeClientCard() {
+            document.getElementById('clientModal').classList.add('hidden');
+        }
+
+        // --- LOGIQUE DE NAVIGATION (SPA) ---
+        function switchSection(sectionName, element) {
+            // Cacher toutes les sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Afficher la section demandée
+            const targetSection = document.getElementById('section-' + sectionName);
+            if(targetSection) targetSection.classList.add('active');
+
+            // Gérer le style actif du menu
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            element.classList.add('active');
+
+            // Mettre à jour le titre du Header
+            const sectionTitles = {
+                'overview': 'Conciergerie',
+                'residences': 'Gestion des Résidences',
+                'reservations': 'Registre des Séjours',
+                'settings': 'Configuration Admin'
+            };
+            document.getElementById('current-page-title').innerText = sectionTitles[sectionName];
+
+            // Fermer la sidebar sur mobile
+            if(window.innerWidth < 768) toggleSidebar();
+        }
+
+        // --- LOGIQUE SIDEBAR MOBILE ---
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const openBtn = document.getElementById('openSidebar');
+        
+        function toggleSidebar() {
+            sidebar.classList.toggle('sidebar-hidden');
+            overlay.classList.toggle('hidden');
+        }
+
+        openBtn.addEventListener('click', toggleSidebar);
+        overlay.addEventListener('click', toggleSidebar);
+
+        // --- INITIALISATION DU GRAPHIQUE ---
+        const ctx = document.getElementById('saphirChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+                datasets: [{
+                    label: 'Arrivées',
+                    data: [12, 19, 14, 25, 22, 30, 28],
+                    borderColor: '#c5a059',
+                    backgroundColor: 'rgba(197, 160, 89, 0.05)',
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 2,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#0a1128',
+                    pointBorderColor: '#c5a059'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { size: 9 }, color: '#94a3b8' } },
+                    y: { display: false }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
