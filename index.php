@@ -29,6 +29,13 @@
             <a href="#suites" class="btn-gold reveal" style="transition-delay: 0.4s; margin-top: 2rem;">Découvrir le Palace</a>
         </div>
     </header>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <style>
+        .flatpickr-day.flatpickr-disabled {
+            color: rgba(255, 0, 0, 0.3) !important;
+            text-decoration: line-through;
+        }
+    </style>
 
     <!-- CHIFFRES CLÉS (STATS) -->
     <section class="stats-bar reveal">
@@ -201,7 +208,7 @@
 
                 <div class="res-form">
                     <h3 class="serif" style="font-size: 2rem; margin-bottom: 2rem;">Fill Your Information</h3>
-                    <form action="reservation.php" method="post" onsubmit="event.preventDefault(); alert('Request sent to Le Saphir Concierge.');">
+                    <form action="reservation.php" method="post">
                         
                         <div class="form-row">
                             <div class="form-group">
@@ -228,17 +235,17 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label class="form-label">Check-in</label>
-                                <input name="date_in" type="date" class="form-input" id="checkin-date" required>
+                                <input name="check_in" type="date" class="form-input" id="checkin-date" required>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Check-out</label>
-                                <input name="date_out" type="date" class="form-input" id="checkout-date" required>
+                                <input name="check_out" type="date" class="form-input" id="checkout-date" required>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label class="form-label">Select Accommodation</label>
-                            <select name="suite_name" class="form-input">
+                            <select name="room_type" class="form-input">
                                 <option>Origin Suite</option>
                                 <option>Ocean Beauty Suite</option>
                                 <option>The Penthouse</option>
@@ -248,7 +255,7 @@
 
                         <div class="form-group" style="margin-top: 25px;">
                             <label class="form-label">Consultation / Special Requests</label>
-                            <textarea class="form-input" placeholder="What would you like us to know about your stay?"></textarea>
+                            <textarea name="special_requests" class="form-input" placeholder="What would you like us to know about your stay?"></textarea>
                         </div>
 
                         <!-- Bouton Saphir pour rappeler le thème -->
