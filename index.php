@@ -24,8 +24,8 @@
     <header class="hero">
         <div class="hero-bg"></div>
         <div class="hero-content">
-            <p class="reveal">Welcome to the Extraordinary</p>
-            <h1 class="serif reveal" style="transition-delay: 0.2s;">Transform Your Stay<br>Into <span class="italic-accent">Timeless Luxury</span></h1>
+            <p class="reveal">Bienvenue dans notre merveilleux hôtel</p>
+            <h1 class="serif reveal" style="transition-delay: 0.2s;">Tranformez votre séjour<br>en <span class="italic-accent">un temps précieux de luxure</span></h1>
             <a href="#suites" class="btn-gold reveal" style="transition-delay: 0.4s; margin-top: 2rem;">Découvrir le Palace</a>
         </div>
     </header>
@@ -41,7 +41,7 @@
     <section class="stats-bar reveal">
         <div class="stat-item">
             <span class="stat-number">5★</span>
-            <span class="stat-label">Forbes Travel Guide</span>
+            <span class="stat-label">Nos avis</span>
         </div>
         <div class="stat-item">
             <span class="stat-number">24/7</span>
@@ -59,7 +59,7 @@
         <section id="suites" class="container section-padding reveal">
             <div class="section-title">
                 <p>Résidences Privées</p>
-                <h2>Explore <span class="italic-accent">Luxury Listings</span></h2>
+                <h2>Explorez <span class="italic-accent">Nos merveilleurse suites</span></h2>
             </div>
             <div class="bento">
                 <div class="card span-2x2" onclick="openModal('origin')">
@@ -67,7 +67,7 @@
                     <div class="card-content">
                         <span class="card-price">À partir de 850€ / nuit</span>
                         <h3 class="serif">Origin Suite</h3>
-                        <p>Modern Elegance & Comfort</p>
+                        <p>Moderne, Elegance et Comfort</p>
                     </div>
                 </div>
                 <div class="card span-2x1" onclick="openModal('beauty')">
@@ -75,7 +75,7 @@
                     <div class="card-content">
                         <span class="card-price">À partir de 1 400€ / nuit</span>
                         <h3 class="serif">Ocean Beauty</h3>
-                        <p>Panoramic Sea Views</p>
+                        <p>Vue panoramique mer</p>
                     </div>
                 </div>
                 <div class="card span-1x1" onclick="openModal('luxurious')">
@@ -83,7 +83,7 @@
                     <div class="card-content">
                         <span class="card-price">Sur Demande</span>
                         <h3 class="serif">Penthouse</h3>
-                        <p>Absolute Exclusivity</p>
+                        <p>Suite exclusive</p>
                     </div>
                 </div>
                 <div class="card span-1x1" onclick="openModal('royalty')">
@@ -91,7 +91,7 @@
                     <div class="card-content">
                         <span class="card-price" style="color: var(--sapphire-light);">Signature</span>
                         <h3 class="serif italic-accent" style="color: var(--gold-primary);">The Royalty</h3>
-                        <p>The Ultimate Experience</p>
+                        <p>L'experience ultime</p>
                     </div>
                 </div>
             </div>
@@ -100,14 +100,14 @@
         <!-- EXPÉRIENCES -->
         <section id="experiences" class="container reveal">
             <div class="section-title">
-                <p>Services & Wellness</p>
-                <h2>Tailored <span class="italic-accent">For You</span></h2>
+                <p>Services et Bien-Etre</p>
+                <h2>Fait <span class="italic-accent">Pour Vous</span></h2>
             </div>
             <div class="bento">
                 <div class="card span-1x2" onclick="openModal('spa_sauna')">
                     <img src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80" alt="Spa">
                     <div class="card-content">
-                        <h3 class="serif">Holistic Spa</h3>
+                        <h3 class="serif">Spa</h3>
                         <p>Sauna & Thermathérapie</p>
                     </div>
                 </div>
@@ -115,28 +115,28 @@
                     <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1200&q=80" alt="Jacuzzi">
                     <div class="card-content">
                         <h3 class="serif">Hydrotherapy</h3>
-                        <p>Panoramic Jacuzzi & Pools</p>
+                        <p>Jacuzzi & piscine</p>
                     </div>
                 </div>
                 <div class="card span-1x1" onclick="openModal('golf')">
                     <img src="https://images.unsplash.com/photo-1587334274328-64186a80aee6?auto=format&fit=crop&w=800&q=80" alt="Golf">
                     <div class="card-content">
-                        <h3 class="serif">Golf Club</h3>
-                        <p>18-Hole Signature</p>
+                        <h3 class="serif">Club de Golf</h3>
+                        <p>18-troue Signature</p>
                     </div>
                 </div>
                 <div class="card span-1x1" onclick="openModal('fitness')">
                     <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=800&q=80" alt="Fitness">
                     <div class="card-content">
-                        <h3 class="serif">Private Gym</h3>
-                        <p>Elite Coaching</p>
+                        <h3 class="serif">Salle De Sport Privée</h3>
+                        <p>Coaching</p>
                     </div>
                 </div>
                 <div class="card span-2x1" onclick="openModal('pool_party')">
                     <img src="https://images.unsplash.com/photo-1574096079513-d8259312b785?auto=format&fit=crop&w=1200&q=80" alt="Beach Club">
                     <div class="card-content">
                         <h3 class="serif">Beach Club</h3>
-                        <p>Exclusive Cabanas & Events</p>
+                        <p>Evenements et bar</p>
                     </div>
                 </div>
             </div>
@@ -145,36 +145,36 @@
         <!-- GASTRONOMIE -->
         <section id="gastronomy" class="container section-padding reveal">
             <div class="section-title">
-                <p>Culinary Arts</p>
-                <h2>Savor the <span class="italic-accent">Extraordinary</span></h2>
+                <p>L'art Culinaire</p>
+                <h2>Savourez <span class="italic-accent">L'extraordinaire</span></h2>
             </div>
             <div class="bento">
                 <div class="card span-2x2" onclick="openModal('restaurant')">
                     <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80" alt="Restaurant L'Épicure">
                     <div class="card-content">
                         <h3 class="serif">L'Épicure</h3>
-                        <p>Michelin-Starred Dining</p>
+                        <p>Dinner Gastronomique</p>
                     </div>
                 </div>
                 <div class="card span-2x1" onclick="openModal('bar')">
                     <img src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=1200&q=80" alt="Bar Mixologie">
                     <div class="card-content">
-                        <h3 class="serif">The Lounge</h3>
-                        <p>Modern Mixology & Jazz</p>
+                        <h3 class="serif">Le Lounge</h3>
+                        <p>Modern et Jazz</p>
                     </div>
                 </div>
                 <div class="card span-1x1" onclick="openModal('cave')">
                     <img src="https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?auto=format&fit=crop&w=800&q=80" alt="Cave à Vin">
                     <div class="card-content">
                         <h3 class="serif">The Cellar</h3>
-                        <p>Rare Vintages</p>
+                        <p>Une Expérience Vintage </p>
                     </div>
                 </div>
                 <div class="card span-1x1" onclick="openModal('brunch')">
                     <img src="https://images.unsplash.com/photo-1511690656956-5129417181c0?auto=format&fit=crop&w=800&q=80" alt="Brunch">
                     <div class="card-content">
-                        <h3 class="serif">Sunday Brunch</h3>
-                        <p>A Weekend Ritual</p>
+                        <h3 class="serif">Le Brunch du Dimanche</h3>
+                        <p>Le Rituel Du Weekend</p>
                     </div>
                 </div>
             </div>
@@ -187,8 +187,8 @@
             <div class="container reservation-grid">
                 
                 <div class="res-info">
-                    <h2 class="serif" style="font-size: 3.5rem; margin-bottom: 1rem;">Let's Begin the<br><span class="italic-accent">Experience</span></h2>
-                    <p>Connect with our private concierges to curate your bespoke journey. From exclusive villa access to private dining, your luxury awaits.</p>
+                    <h2 class="serif" style="font-size: 3.5rem; margin-bottom: 1rem;">Commencez L'experience<br><span class="italic-accent">Dès Maintenant</span></h2>
+                    <p>Contactez notre conciergerie privée afin de vivre cette experience au maximum. De la villa exclusive, à l'acces privé du restaurant, le luxe n'attend plus que vous.</p>
                     
                     <ul class="contact-list">
                         <li>
@@ -196,18 +196,18 @@
                             <strong>1 Avenue de l'Océan, Riviera</strong>
                         </li>
                         <li>
-                            <span>Private Line</span>
+                            <span>Ligne privée</span>
                             <strong>+33 (0)4 93 12 34 56</strong>
                         </li>
                         <li>
-                            <span>Email Support</span>
+                            <span>Email</span>
                             <strong>booking@lesaphir.com</strong>
                         </li>
                     </ul>
                 </div>
 
                 <div class="res-form">
-                    <h3 class="serif" style="font-size: 2rem; margin-bottom: 2rem;">Fill Your Information</h3>
+                    <h3 class="serif" style="font-size: 2rem; margin-bottom: 2rem;">Remplissez Vos Informations</h3>
                     <form action="reservation.php" method="post">
                         
                         <div class="form-row">
@@ -259,7 +259,7 @@
                         </div>
 
                         <!-- Bouton Saphir pour rappeler le thème -->
-                        <button type="submit" class="btn-sapphire">Complete Booking Request</button>
+                        <button type="submit" class="btn-sapphire">Réservation Fini</button>
                     </form>
                 </div>
 
@@ -274,7 +274,7 @@
             <div class="footer-grid">
                 <div class="footer-brand">
                     <h2 class="serif">Le Saphir</h2>
-                    <p>Where coastal luxury meets unparalleled hospitality. Discover a sanctuary designed for comfort and elegance.</p>
+                    <p>Découvrez un sanctuaire conçu pour le comfort et l'élégance.</p>
                 </div>
                 
                 <div class="footer-col">
@@ -336,7 +336,7 @@
                     <p style="color: var(--sapphire-light); text-transform: uppercase; letter-spacing: 3px; font-size: 0.8rem; margin-bottom: 15px;" id="m-subtitle">Category</p>
                     <h2 class="serif italic-accent" id="m-title">Title</h2>
                     <p class="modal-desc" id="m-desc">Description textuelle riche...</p>
-                    <button class="btn-sapphire" style="margin-top: 1rem; width: auto;" onclick="closeModal(); window.location.href='#reservation'">Request to Book</button>
+                    <button class="btn-sapphire" style="margin-top: 1rem; width: auto;" onclick="closeModal(); window.location.href='#reservation'">Réservez</button>
                 </div>
                 <div class="modal-services">
                     <h3 class="serif">Exclusive Inclusions</h3>
