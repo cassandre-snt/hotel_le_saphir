@@ -112,14 +112,14 @@
                     </div>
                 </div>
                 <div class="card span-2x1" onclick="openModal('jacuzzi')">
-                    <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1200&q=80" alt="Jacuzzi">
+                    <img src="image/piscine.png" alt="Jacuzzi">
                     <div class="card-content">
                         <h3 class="serif">Hydrotherapy</h3>
                         <p>Jacuzzi & piscine</p>
                     </div>
                 </div>
                 <div class="card span-1x1" onclick="openModal('golf')">
-                    <img src="https://images.unsplash.com/photo-1587334274328-64186a80aee6?auto=format&fit=crop&w=800&q=80" alt="Golf">
+                    <img src="image/club.golf.png" alt="Golf">
                     <div class="card-content">
                         <h3 class="serif">Club de Golf</h3>
                         <p>18-troue Signature</p>
@@ -133,7 +133,7 @@
                     </div>
                 </div>
                 <div class="card span-2x1" onclick="openModal('pool_party')">
-                    <img src="https://images.unsplash.com/photo-1574096079513-d8259312b785?auto=format&fit=crop&w=1200&q=80" alt="Beach Club">
+                    <img src="image/club_beach.jpg" alt="Beach Club">
                     <div class="card-content">
                         <h3 class="serif">Beach Club</h3>
                         <p>Evenements et bar</p>
@@ -171,7 +171,7 @@
                     </div>
                 </div>
                 <div class="card span-1x1" onclick="openModal('brunch')">
-                    <img src="https://images.unsplash.com/photo-1511690656956-5129417181c0?auto=format&fit=crop&w=800&q=80" alt="Brunch">
+                    <img src="image/brunch.jpg" alt="Brunch">
                     <div class="card-content">
                         <h3 class="serif">Le Brunch du Dimanche</h3>
                         <p>Le Rituel Du Weekend</p>
