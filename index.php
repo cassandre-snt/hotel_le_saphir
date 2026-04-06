@@ -112,7 +112,7 @@
                     </div>
                 </div>
                 <div class="card span-2x1" onclick="openModal('jacuzzi')">
-                    <img src="image/piscine.png" alt="Jacuzzi">
+                    <img src="image/jaccuzzi.png" alt="Jacuzzi">
                     <div class="card-content">
                         <h3 class="serif">Hydrotherapy</h3>
                         <p>Jacuzzi & piscine</p>
