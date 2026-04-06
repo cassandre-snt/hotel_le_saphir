@@ -1,3 +1,20 @@
+<?php
+
+if(isset($_GET['error'])) {
+    $error = $_GET['error'];
+    if ($error === 'error_reservation') {
+        echo "<script>alert('Désolé, une erreur est survenue lors de votre réservation. Veuillez réessayer.');</script>";
+    }
+}
+
+if(isset($_GET['success'])) {
+    $success = $_GET['success'];
+    if ($success === 'reservation_success') {
+        echo "<script>alert('Votre demande de réservation a été envoyée avec succès ! Nous vous contacterons sous peu.');</script>";
+    }
+}
+
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -5,13 +22,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Le Saphir | The Epitome of Luxury</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="data/css/style.css">
 </head>
 <body>
 
     <!-- NAVIGATION -->
     <nav>
-        <div class="logo serif"> <img src="image/logo.png" alt="Origin Saphir"> </div>
+        <div class="logo serif"> <img src="data/image/logo.png" alt="Origin Saphir"> </div>
         <div class="nav-links">
             <a href="#suites">Résidences</a>
             <a href="#experiences">Expériences</a>
@@ -347,7 +364,8 @@
             </div>
         </div>
     </div>
-<script src="script.js"></script>
+<script src="data/js/script.js"></script>
+<script src="data/js/get_booked.js"></script>
    
 </body>
 </html>

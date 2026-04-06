@@ -39,6 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             AND ((date_in < ? AND date_out > ?))"); 
         $checkDates->bind_param("sss", $suite_name, $date_out, $date_in);
         $checkDates->execute();
+        
         if ($checkDates->get_result()->num_rows > 0) {
             throw new Exception("Désolé, cette suite est déjà réservée pour ces dates.");
         }
@@ -47,15 +48,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bind_param("issss", $user_id, $suite_name, $date_in, $date_out, $special_requests);
         
         if ($stmt->execute()) {
-            $conn->commit(); 
-            echo "Reservation successful!";
+            $conn->commit();
+            
+            header("Location: index.php?success=" . urlencode("reservation_success"));
+            exit();
         } else {
             throw new Exception("Erreur lors de l'insertion : " . $stmt->error);
         }
 
     } catch (Exception $e) {
         $conn->rollback();
-        echo "Error: " . $e->getMessage();
+        header("Location: index.php?error=" . urlencode("error_reservation"));
+        exit();
     }
 }
 
