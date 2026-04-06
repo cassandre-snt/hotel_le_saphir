@@ -1,5 +1,6 @@
 <?php
 require 'config.php';
+require 'utils.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = $_POST['name'] ?? '';
@@ -27,8 +28,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($row = $result->fetch_assoc()) {
             $user_id = $row['user_id'];
         } else {
-            $createUser = $conn->prepare("INSERT INTO user (name, last_name, email, phone) VALUES (?, ?, ?, ?)");
-            $createUser->bind_param("ssss", $name, $last_name, $email, $phone);
+            $password = generateRandomPassword();
+            $createUser = $conn->prepare("INSERT INTO user (name, last_name, email, phone, password) VALUES (?, ?, ?, ?, ?)");
+            $createUser->bind_param("sssss", $name, $last_name, $email, $phone, $password);
             $createUser->execute();
             $user_id = $conn->insert_id; 
         }
