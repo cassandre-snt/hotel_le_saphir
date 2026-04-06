@@ -76,11 +76,11 @@ if(isset($_GET['success'])) {
         <section id="suites" class="container section-padding reveal">
             <div class="section-title">
                 <p>Résidences Privées</p>
-                <h2>Explorez <span class="italic-accent">Nos merveilleurse suites</span></h2>
+                <h2>Explorez <span class="italic-accent">Nos merveilleuses suites</span></h2>
             </div>
             <div class="bento">
                 <div class="card span-2x2" onclick="openModal('origin')">
-                    <img src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=1200&q=80" alt="Origin Saphir">
+                    <img src="image/luxe.png" alt="Origin Saphir">
                     <div class="card-content">
                         <span class="card-price">À partir de 850€ / nuit</span>
                         <h3 class="serif">Origin Suite</h3>
@@ -88,7 +88,7 @@ if(isset($_GET['success'])) {
                     </div>
                 </div>
                 <div class="card span-2x1" onclick="openModal('beauty')">
-                    <img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80" alt="Beauty Saphir">
+                    <img src="image/vue_ocean2.webp" alt="Beauty Saphir">
                     <div class="card-content">
                         <span class="card-price">À partir de 1 400€ / nuit</span>
                         <h3 class="serif">Ocean Beauty</h3>
@@ -96,7 +96,7 @@ if(isset($_GET['success'])) {
                     </div>
                 </div>
                 <div class="card span-1x1" onclick="openModal('luxurious')">
-                    <img src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=800&q=80" alt="Luxurious Saphir">
+                    <img src="image/vue_ocean4.webp" alt="Luxurious Saphir">
                     <div class="card-content">
                         <span class="card-price">Sur Demande</span>
                         <h3 class="serif">Penthouse</h3>
@@ -104,7 +104,7 @@ if(isset($_GET['success'])) {
                     </div>
                 </div>
                 <div class="card span-1x1" onclick="openModal('royalty')">
-                    <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80" alt="Royalty Saphir">
+                    <img src="image/Royaute.png" alt="Royalty Saphir">
                     <div class="card-content">
                         <span class="card-price" style="color: var(--sapphire-light);">Signature</span>
                         <h3 class="serif italic-accent" style="color: var(--gold-primary);">The Royalty</h3>
@@ -122,7 +122,7 @@ if(isset($_GET['success'])) {
             </div>
             <div class="bento">
                 <div class="card span-1x2" onclick="openModal('spa_sauna')">
-                    <img src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80" alt="Spa">
+                    <img src="image/spa5.jpg" alt="Spa">
                     <div class="card-content">
                         <h3 class="serif">Spa</h3>
                         <p>Sauna & Thermathérapie</p>
@@ -143,7 +143,7 @@ if(isset($_GET['success'])) {
                     </div>
                 </div>
                 <div class="card span-1x1" onclick="openModal('fitness')">
-                    <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=800&q=80" alt="Fitness">
+                    <img src="image/sport.jpg" alt="Fitness">
                     <div class="card-content">
                         <h3 class="serif">Salle De Sport Privée</h3>
                         <p>Coaching</p>
@@ -183,12 +183,12 @@ if(isset($_GET['success'])) {
                 <div class="card span-1x1" onclick="openModal('cave')">
                     <img src="https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?auto=format&fit=crop&w=800&q=80" alt="Cave à Vin">
                     <div class="card-content">
-                        <h3 class="serif">The Cellar</h3>
+                        <h3 class="serif">La Cave</h3>
                         <p>Une Expérience Vintage </p>
                     </div>
                 </div>
                 <div class="card span-1x1" onclick="openModal('brunch')">
-                    <img src="image/brunch.jpg" alt="Brunch">
+                    <img src="image/brunch2.jpg" alt="Brunch">
                     <div class="card-content">
                         <h3 class="serif">Le Brunch du Dimanche</h3>
                         <p>Le Rituel Du Weekend</p>
