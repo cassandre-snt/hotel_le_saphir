@@ -1,0 +1,824 @@
+<?php 
+require 'config.php';
+require 'utils.php';
+require 'model/user.php';
+
+$reservations = getUserOderByResevationDate($conn);
+// var_dump($reservations);
+
+?>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le Saphir | Tableau de Bord Admin</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Playfair Display & Montserrat -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        saphir: {
+                            dark: '#0a1128', // Bleu Saphir profond
+                            DEFAULT: '#1a2a4d',
+                            light: '#243b6b'
+                        },
+                        gold: {
+                            light: '#e2c792',
+                            DEFAULT: '#c5a059', // Or signature
+                            dark: '#a6833d'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .sidebar-transition { transition: all 0.3s ease-in-out; }
+        @media (max-width: 768px) { .sidebar-hidden { transform: translateX(-100%); } }
+        .italic-accent { font-family: 'Playfair Display', serif; font-style: italic; }
+        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        
+        /* Gestion des sections */
+        .content-section { display: none; }
+        .content-section.active { display: block; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Style bouton actif sidebar */
+        .nav-item.active { background-color: rgba(197, 160, 89, 0.15); color: #c5a059; border-left: 4px solid #c5a059; }
+
+        /* Animation Fiche Client */
+        #clientModal.hidden { display: none; }
+        #clientModal:not(.hidden) { display: flex; animation: modalFadeIn 0.3s ease forwards; }
+        @keyframes modalFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Animation Fiche Admin Réservation */
+        #reservationFormModal.hidden { display: none; }
+        #reservationFormModal:not(.hidden) { display: flex; animation: modalFadeIn 0.3s ease forwards; }
+
+        /* Animation Pop-up Stats */
+        #statsDetailsModal.hidden { display: none; }
+        #statsDetailsModal:not(.hidden) { display: flex; animation: modalFadeIn 0.3s ease forwards; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans">
+
+    <!-- ========================================== -->
+    <!-- MODALE : DÉTAILS STATISTIQUES (POP-UP)     -->
+    <!-- ========================================== -->
+    <div id="statsDetailsModal" class="fixed inset-0 z-[110] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-saphir-dark/90 backdrop-blur-sm" onclick="closeStatsModal()"></div>
+        <div class="relative bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden border border-gold/30 transform transition-all">
+            <div class="bg-saphir-dark p-6 border-b border-gold/30 flex justify-between items-center">
+                <h3 id="statsModalTitle" class="font-serif text-xl text-gold italic-accent uppercase tracking-widest">Détails Statistiques</h3>
+                <button onclick="closeStatsModal()" class="text-gold hover:text-white transition-colors text-2xl">&times;</button>
+            </div>
+            <div class="p-8">
+                <!-- Conteneur pour le graphique -->
+                <div id="statsChartContainer" class="h-64 mb-6">
+                    <canvas id="statsDetailChart"></canvas>
+                </div>
+                <!-- Conteneur pour les informations textuelles additionnelles -->
+                <div id="statsTextContent" class="space-y-4 text-sm text-gray-600">
+                    <!-- Rempli par JS -->
+                </div>
+            </div>
+            <div class="p-6 bg-gray-50 border-t border-gray-100 text-center">
+                <button onclick="closeStatsModal()" class="bg-saphir text-gold border border-gold/30 px-8 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest hover:bg-gold hover:text-white transition">Fermer l'analyse</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODALE : FICHE CLIENT (S'affiche au clic ou via recherche) -->
+    <!-- ========================================== -->
+    <div id="clientModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+        <!-- Overlay flou -->
+        <div class="absolute inset-0 bg-saphir-dark/80 backdrop-blur-md" onclick="closeClientCard()"></div>
+        
+        <!-- Contenu de la fiche -->
+        <div class="relative bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden border border-gold/30 transform transition-all">
+            <!-- En-tête de la fiche -->
+            <div class="bg-saphir-dark p-8 text-center border-b border-gold/30">
+                <div class="w-20 h-20 bg-gold/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-gold/20">
+                    <i class="fa-solid fa-user-tie text-gold text-3xl"></i>
+                </div>
+                <h3 id="m-full-name" class="font-serif text-2xl text-gold italic-accent">Prénom Nom</h3>
+                <p class="text-[10px] uppercase tracking-[0.3em] text-gold/50 mt-1">Client Privilège Le Saphir</p>
+            </div>
+
+            <!-- Détails de la fiche -->
+            <div class="p-8 space-y-6">
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <label class="text-[10px] uppercase font-bold text-gray-400 block mb-1">Prénom</label>
+                        <p id="m-firstname" class="text-sm font-semibold text-saphir">-</p>
+                    </div>
+                    <div>
+                        <label class="text-[10px] uppercase font-bold text-gray-400 block mb-1">Nom de famille</label>
+                        <p id="m-lastname" class="text-sm font-semibold text-saphir">-</p>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-gray-50">
+                    <label class="text-[10px] uppercase font-bold text-gray-400 block mb-1">Résidence Actuelle</label>
+                    <p id="m-suite" class="text-lg font-serif italic-accent text-gold">-</p>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4 pt-4 border-t border-gray-50">
+                    <div class="flex items-center space-x-4">
+                        <i class="fa-solid fa-phone text-gold text-sm w-5"></i>
+                        <div>
+                            <label class="text-[9px] uppercase font-bold text-gray-400 block">Téléphone</label>
+                            <p id="m-phone" class="text-sm text-saphir font-medium">-</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <i class="fa-solid fa-envelope text-gold text-sm w-5"></i>
+                        <div>
+                            <label class="text-[9px] uppercase font-bold text-gray-400 block">Email</label>
+                            <p id="m-email" class="text-sm text-saphir font-medium">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bouton Fermer -->
+            <div class="p-6 bg-gray-50 text-center">
+                <button onclick="closeClientCard()" class="bg-saphir text-gold border border-gold/30 px-8 py-3 rounded-full text-[10px] font-bold uppercase tracking-widest hover:bg-gold hover:text-white transition-all">
+                    Fermer la fiche
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- AJOUT : MODALE FORMULAIRE RÉSERVATION (Admin) -->
+    <!-- ========================================== -->
+    <div id="reservationFormModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+        <!-- Overlay flou -->
+        <div class="absolute inset-0 bg-saphir-dark/80 backdrop-blur-md" onclick="closeReservationModal()"></div>
+        
+        <!-- Contenu du formulaire -->
+        <div class="relative bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden border border-gold/30 transform transition-all">
+            <!-- En-tête -->
+            <div class="bg-saphir-dark p-6 text-center border-b border-gold/30">
+                <h3 class="font-serif text-xl text-gold italic-accent">Gérer la Réservation</h3>
+                <p class="text-[10px] uppercase tracking-widest text-gold/50 mt-1">Formulaire Administrateur</p>
+            </div>
+
+            <!-- Formulaire -->
+            <form id="reservationForm" class="p-8 space-y-4">
+                <input type="hidden" id="form-index" value="">
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[10px] uppercase font-bold text-gray-400 block mb-1">Prénom</label>
+                        <input type="text" id="form-firstname" required class="w-full border-b border-gray-200 py-1.5 outline-none focus:border-gold text-sm font-medium text-saphir bg-transparent">
+                    </div>
+                    <div>
+                        <label class="text-[10px] uppercase font-bold text-gray-400 block mb-1">Nom de famille</label>
+                        <input type="text" id="form-lastname" required class="w-full border-b border-gray-200 py-1.5 outline-none focus:border-gold text-sm font-medium text-saphir bg-transparent">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-[10px] uppercase font-bold text-gray-400 block mb-1">Résidence Saphir</label>
+                    <select id="form-suite-select" class="w-full border-b border-gray-200 py-1.5 outline-none focus:border-gold text-sm font-medium text-saphir bg-transparent">
+                        <option>The Royalty Signature</option>
+                        <option>Ocean Beauty Suite</option>
+                        <option>Origin Suite #102</option>
+                        <option>Penthouse Saphir</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[10px] uppercase font-bold text-gray-400 block mb-1">Date Début</label>
+                        <input type="text" id="form-start" placeholder="Ex: 12 Avril" required class="w-full border-b border-gray-200 py-1.5 outline-none focus:border-gold text-sm font-medium text-saphir bg-transparent">
+                    </div>
+                    <div>
+                        <label class="text-[10px] uppercase font-bold text-gray-400 block mb-1">Date Fin</label>
+                        <input type="text" id="form-end" placeholder="Ex: 15 Avril" required class="w-full border-b border-gray-200 py-1.5 outline-none focus:border-gold text-sm font-medium text-saphir bg-transparent">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[10px] uppercase font-bold text-gray-400 block mb-1">Téléphone</label>
+                        <input type="tel" id="form-phone" required class="w-full border-b border-gray-200 py-1.5 outline-none focus:border-gold text-sm font-medium text-saphir bg-transparent">
+                    </div>
+                    <div>
+                        <label class="text-[10px] uppercase font-bold text-gray-400 block mb-1">Email</label>
+                        <input type="email" id="form-email" required class="w-full border-b border-gray-200 py-1.5 outline-none focus:border-gold text-sm font-medium text-saphir bg-transparent">
+                    </div>
+                </div>
+
+                <div class="pt-4 flex justify-end space-x-3">
+                    <button type="button" onclick="closeReservationModal()" class="px-4 py-2 text-xs font-bold uppercase text-gray-400 hover:text-gray-600 transition">Annuler</button>
+                    <button type="submit" class="bg-saphir text-gold border border-gold/30 px-6 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest hover:bg-gold hover:text-white transition-all">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Mobile Overlay (Sidebar) -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden md:hidden"></div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="fixed left-0 top-0 h-full w-72 bg-saphir-dark text-white z-30 sidebar-transition sidebar-hidden md:translate-x-0 border-r border-gold/20">
+        <div class="p-8">
+            <div class="mb-10 text-center">
+                <h1 class="font-serif text-2xl tracking-widest uppercase text-gold">Le Saphir</h1>
+                <p class="text-[10px] uppercase tracking-[0.3em] text-gold/60 mt-1">Administration Palace</p>
+            </div>
+
+            <nav class="space-y-2">
+                <button onclick="switchSection('overview', this)" class="nav-item active w-full flex items-center space-x-4 p-3 rounded text-gray-400 hover:text-gold hover:bg-white/5 transition">
+                    <i class="fa-solid fa-gauge-high w-5"></i>
+                    <span class="text-sm font-medium uppercase tracking-wider">Vue d'ensemble</span>
+                </button>
+                <button onclick="switchSection('residences', this)" class="nav-item w-full flex items-center space-x-4 p-3 rounded text-gray-400 hover:text-gold hover:bg-white/5 transition">
+                    <i class="fa-solid fa-bed w-5"></i>
+                    <span class="text-sm font-medium uppercase tracking-wider">Résidences</span>
+                </button>
+                <button onclick="switchSection('reservations', this)" class="nav-item w-full flex items-center space-x-4 p-3 rounded text-gray-400 hover:text-gold hover:bg-white/5 transition">
+                    <i class="fa-solid fa-calendar-check w-5"></i>
+                    <span class="text-sm font-medium uppercase tracking-wider">Réservations</span>
+                </button>
+                <div class="pt-8 mt-8 border-t border-white/10">
+                    <button onclick="switchSection('settings', this)" class="nav-item w-full flex items-center space-x-4 p-3 rounded text-gray-400 hover:text-gold transition">
+                        <i class="fa-solid fa-gear w-5"></i>
+                        <span class="text-sm font-medium uppercase tracking-wider">Paramètres</span>
+                    </button>
+                </div>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="md:ml-72 min-h-screen flex flex-col">
+        
+        <!-- HEADER -->
+        <header class="h-20 glass border-b border-gray-200 flex items-center justify-between px-8 sticky top-0 z-10">
+            <div class="flex items-center">
+                <button id="openSidebar" class="md:hidden mr-4 text-saphir focus:outline-none">
+                    <i class="fa-solid fa-bars-staggered text-2xl"></i>
+                </button>
+                <h2 class="font-serif text-xl text-saphir leading-none">Bonjour, <span class="italic-accent" id="current-page-title">Conciergerie</span></h2>
+            </div>
+
+            <div class="flex items-center space-x-6">
+                <div class="relative hidden lg:block">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                    <input id="searchInput" type="text" placeholder="Rechercher un client (Julian, Elena...)" class="bg-gray-100 border-none rounded-full py-2 pl-10 pr-4 text-xs focus:ring-1 focus:ring-gold outline-none w-64 transition-all">
+                </div>
+                <button class="relative text-saphir">
+                    <i class="fa-solid fa-bell text-xl"></i>
+                    <span class="absolute -top-1 -right-1 bg-gold text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white">3</span>
+                </button>
+                <div class="flex items-center space-x-3 border-l pl-6 border-gray-200">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-xs font-bold text-saphir uppercase tracking-tighter">Cassandre Sanita</p>
+                        <p class="text-[10px] text-gold font-medium uppercase">Directrice</p>
+                    </div>
+                    <img class="h-10 w-10 rounded-full object-cover ring-2 ring-gold/20" src="https://ui-avatars.com/api/?name=CS+Salace&background=0a1128&color=c5a059" alt="Profile">
+                </div>
+            </div>
+        </header>
+
+        <!-- DASHBOARD BODY -->
+        <main class="p-8 flex-1">
+
+            <!-- SECTION 1 : VUE D'ENSEMBLE -->
+            <section id="section-overview" class="content-section active">
+                <!-- STATS GRID -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                    <!-- CARTE 1 -->
+                    <div onclick="openStatsModal('booking')" class="bg-white p-6 rounded-xl shadow-sm border-b-4 border-gold group cursor-pointer hover:shadow-lg transition-all">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1">Taux de réservation</p>
+                                <h3 class="text-2xl font-serif text-saphir">80%</h3>
+                            </div>
+                            <div class="p-3 bg-gold/10 text-gold rounded-lg group-hover:bg-gold group-hover:text-white transition-colors">
+                                <i class="fa-solid fa-vault text-xl"></i>
+                            </div>
+                        </div>
+                        <p class="text-[11px] mt-4 text-green-600 font-bold uppercase"><i class="fa-solid fa-arrow-up mr-1"></i> 14% ce mois</p>
+                    </div>
+
+                    <!-- CARTE 2 -->
+                    <div onclick="openStatsModal('occupancy')" class="bg-white p-6 rounded-xl shadow-sm border-b-4 border-saphir group cursor-pointer hover:shadow-lg transition-all">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1">Taux d'Occupation</p>
+                                <h3 class="text-2xl font-serif text-saphir">92%</h3>
+                            </div>
+                            <div class="p-3 bg-saphir/10 text-saphir rounded-lg group-hover:bg-saphir group-hover:text-white transition-colors">
+                                <i class="fa-solid fa-key text-xl"></i>
+                            </div>
+                        </div>
+                        <p class="text-[11px] mt-4 text-blue-600 font-bold uppercase">Période de Haute Saison</p>
+                    </div>
+
+                    <!-- CARTE 3 -->
+                    <div onclick="openStatsModal('requests')" class="bg-white p-6 rounded-xl shadow-sm border-b-4 border-gold group cursor-pointer hover:shadow-lg transition-all">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1">Nouvelles Demandes</p>
+                                <h3 class="text-2xl font-serif text-saphir">24</h3>
+                            </div>
+                            <div class="p-3 bg-gold/10 text-gold rounded-lg group-hover:bg-gold group-hover:text-white transition-colors">
+                                <i class="fa-solid fa-envelope-open-text text-xl"></i>
+                            </div>
+                        </div>
+                        <p class="text-[11px] mt-4 text-amber-600 font-bold uppercase">8 en attente</p>
+                    </div>
+
+                    <!-- CARTE 4 -->
+                    <div onclick="openStatsModal('satisfaction')" class="bg-white p-6 rounded-xl shadow-sm border-b-4 border-saphir group cursor-pointer hover:shadow-lg transition-all">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1">Satisfaction</p>
+                                <h3 class="text-2xl font-serif text-saphir">4.9/5</h3>
+                            </div>
+                            <div class="p-3 bg-saphir/10 text-saphir rounded-lg group-hover:bg-saphir group-hover:text-white transition-colors">
+                                <i class="fa-solid fa-star text-xl"></i>
+                            </div>
+                        </div>
+                        <p class="text-[11px] mt-4 text-green-600 font-bold uppercase">Excellent (340 avis)</p>
+                    </div>
+                </div>
+
+                <!-- TABLEAU DES ARRIVÉES -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+                        <div class="p-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+                            <h3 class="font-serif text-lg text-saphir">Dernières <span class="italic-accent">Arrivées</span></h3>
+                            <p class="text-[10px] text-gray-400 italic">Cliquez sur une ligne ou recherchez un nom pour voir le profil</p>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="text-[10px] uppercase tracking-widest text-gray-400 border-b border-gray-100">
+                                        <th class="px-6 py-4 font-semibold">Client</th>
+                                        <th class="px-6 py-4 font-semibold">Résidence</th>
+                                        <th class="px-6 py-4 font-semibold">Date</th>
+                                        <th class="px-6 py-4 text-center">Statut</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-sm divide-y divide-gray-50">
+                                    <?php
+                                     for($i = 0;$i<count($reservations);$i++) {
+                                        $complete_name = $reservations[$i]['name'] . ' ' . $reservations[$i]['last_name'];
+                                        $firstname = $reservations[$i]['name'];
+                                        $lastname = $reservations[$i]['last_name'];
+                                        $suite = $reservations[$i]['suite_name'];
+                                        $phone = $reservations[$i]['phone'];
+                                        $email = $reservations[$i]['email'];
+                                        $date_in = formatShortDate($reservations[$i]['date_in']);
+                                        $date_out = formatShortDate($reservations[$i]['date_out']);
+                                        $status = $reservations[$i]['status'];
+                                    ?>
+                                    <!-- LIGNE CLIENT 1 -->
+                                    <tr class="hover:bg-gold/5 transition cursor-pointer group" 
+                                        onclick="openClientCard(this)"
+                                        data-firstname="<?= $reservations[$i]['name'] ?>"
+                                        data-lastname="<?= $reservations[$i]['last_name'] ?>"
+                                        data-suite="<?= $reservations[$i]['suite_name'] ?>"
+                                        data-phone="<?= $reservations[$i]['phone'] ?>"
+                                        data-email="<?= $reservations[$i]['email'] ?>">
+                                        <td class="px-6 py-4 font-medium text-saphir group-hover:text-gold transition"><?= $complete_name ?></td>
+                                        <td class="px-6 py-4 italic-accent text-gold"><?= $suite ?></td>
+                                        <td class="px-6 py-4 text-xs text-gray-400 uppercase tracking-tighter"><?= $date_in ?> - <?= $date_out ?></td>
+                                        <td class="px-6 py-4 text-center">
+                                            <span class="px-2 py-1 text-[9px] font-bold bg-green-100 text-green-700 rounded-full uppercase"><?= $status ?></span>
+                                        </td>
+                                    </tr>
+                                    <?php
+                                     }
+                                    ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 2 : RÉSIDENCES -->
+            <section id="section-residences" class="content-section">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white rounded-xl overflow-hidden shadow-sm border border-gold/20">
+                        <img src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=400" class="w-full h-40 object-cover">
+                        <div class="p-4">
+                            <h4 class="font-serif text-saphir text-lg">The Royalty Signature</h4>
+                            <p class="text-xs text-gray-400 uppercase tracking-widest mb-4">Suite Impériale</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-green-600 text-[10px] font-bold uppercase">Disponible</span>
+                                <button class="text-gold text-xs font-bold border border-gold px-3 py-1 rounded hover:bg-gold hover:text-white transition">Gérer</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 3 : RÉSERVATIONS -->
+            <section id="section-reservations" class="content-section">
+                <div class="flex flex-col space-y-8">
+                    
+                    <!-- État des Suites Signatures -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-saphir-dark p-6 rounded-2xl border border-gold/30 text-white shadow-xl">
+                            <div class="flex justify-between items-center mb-4">
+                                <h4 class="font-serif text-gold italic-accent text-lg">The Royalty</h4>
+                                <span class="text-[9px] bg-red-500/20 text-red-400 px-2 py-1 rounded border border-red-500/50 uppercase font-bold tracking-widest">Occupée</span>
+                            </div>
+                            <p class="text-[10px] text-gray-400 uppercase mb-1 tracking-widest">Libre à partir du :</p>
+                            <p class="text-lg font-medium text-white">02 Avril 2024</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                            <div class="flex justify-between items-center mb-4">
+                                <h4 class="font-serif text-saphir italic-accent text-lg">Ocean Beauty</h4>
+                                <span class="text-[9px] bg-amber-500/20 text-amber-600 px-2 py-1 rounded border border-amber-500/50 uppercase font-bold tracking-widest">Fin de séjour</span>
+                            </div>
+                            <p class="text-[10px] text-gray-400 uppercase mb-1 tracking-widest">Libre à partir du :</p>
+                            <p class="text-lg font-medium text-saphir">31 Mars 2024</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                            <div class="flex justify-between items-center mb-4">
+                                <h4 class="font-serif text-saphir italic-accent text-lg">Origin Suite</h4>
+                                <span class="text-[9px] bg-green-500/20 text-green-600 px-2 py-1 rounded border border-green-500/50 uppercase font-bold tracking-widest">Disponible</span>
+                            </div>
+                            <p class="text-[10px] text-gray-400 uppercase mb-1 tracking-widest">Libre à partir du :</p>
+                            <p class="text-lg font-medium text-green-600 italic">Immédiatement</p>
+                        </div>
+                    </div>
+
+                    <!-- Registre Complet -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="p-6 bg-gray-50/50 border-b border-gray-100 flex justify-between items-center">
+                            <h3 class="font-serif text-xl text-saphir italic-accent tracking-wide">Planning Global des Séjours</h3>
+                            <!-- Ajout de onclick="openReservationModal()" -->
+                            <button onclick="openReservationModal()" class="bg-gold text-white text-[10px] font-bold px-6 py-2 rounded-full uppercase tracking-widest shadow-lg shadow-gold/20 hover:bg-gold-dark transition-all">Nouvelle Réservation</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead class="text-[10px] uppercase tracking-[0.2em] text-gray-400 border-b border-gray-100">
+                                    <tr>
+                                        <th class="px-6 py-4 font-semibold">Résidence</th>
+                                        <th class="px-6 py-4 font-semibold">Client Principal</th>
+                                        <th class="px-6 py-4 font-semibold">Période du Séjour</th>
+                                        <th class="px-6 py-4 font-semibold text-center">Disponibilité Future</th>
+                                        <!-- Ajout du header Actions pour Admin -->
+                                        <th class="px-6 py-4 font-semibold text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reservations-table-body" class="text-sm divide-y divide-gray-50">
+                                    <!-- Généré dynamiquement par JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 4 : PARAMÈTRES -->
+            <section id="section-settings" class="content-section">
+                <div class="max-w-xl bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="font-serif text-xl text-saphir mb-6 tracking-wide">Configuration du Système</h3>
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-[10px] uppercase font-bold text-gray-400 mb-2 tracking-widest">Nom de l'Établissement</label>
+                            <input type="text" value="Le Saphir Palace & Spa" class="w-full border-b border-gray-200 py-2 outline-none focus:border-gold text-sm font-medium transition">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] uppercase font-bold text-gray-400 mb-2 tracking-widest">Langue de l'Interface</label>
+                            <select class="w-full border-b border-gray-200 py-2 outline-none focus:border-gold text-sm bg-transparent">
+                                <option>Français (FR)</option>
+                                <option>English (UK)</option>
+                            </select>
+                        </div>
+                        <button class="bg-gold text-white text-[10px] font-bold px-10 py-4 rounded-full uppercase tracking-widest shadow-lg shadow-gold/20 hover:bg-gold-dark transition-all">Enregistrer les réglages</button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="p-8 text-center text-[10px] uppercase tracking-[0.2em] text-gray-400">
+            &copy; 2024 Le Saphir Palace - Système de Gestion Propriétaire
+        </footer>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script>
+        // --- DONNÉES SIMULÉES ---
+        const reservationsList = [
+            { suite: "The Royalty Signature", guest: "Julian De Silva", start: "28 Mars", end: "02 Avril", phone: "+33 09.45.46.37", email: "j.desilva@prestige.com", status: "Occupé" },
+            { suite: "Ocean Beauty Suite", guest: "Elena Markov", start: "29 Mars", end: "31 Mars", phone: "+44 20 7946 0958", email: "e.markov@residence.ru", status: "Fin de séjour" },
+            { suite: "Origin Suite #102", guest: "Hans Lehmann", start: "30 Mars", end: "05 Avril", phone: "+49 157 39201", email: "hans@lehmann.de", status: "Occupé" },
+            { suite: "Penthouse Saphir", guest: "Libre", start: "-", end: "-", phone: "-", email: "-", status: "Libre" }
+        ];
+
+        let currentDetailChart = null; // Stockage du graphique de la modale
+
+        // --- GÉNÉRER LE REGISTRE DES RÉSERVATIONS ---
+        function renderReservationsTable() {
+            const tableBody = document.getElementById('reservations-table-body');
+            tableBody.innerHTML = '';
+
+            reservationsList.forEach((res, index) => { // Ajout de "index" pour les actions admin
+                const isLibre = res.guest === "Libre";
+                const row = document.createElement('tr');
+                row.className = "hover:bg-gold/5 transition group";
+                
+                row.innerHTML = `
+                    <td onclick="${isLibre ? '' : `openClientCardFromData(reservationsList[${index}])`}" class="px-6 py-4 font-serif text-saphir italic-accent text-base group-hover:text-gold transition cursor-pointer">${res.suite}</td>
+                    <td onclick="${isLibre ? '' : `openClientCardFromData(reservationsList[${index}])`}" class="px-6 py-4 cursor-pointer">
+                        <span class="${isLibre ? 'text-gray-300 italic' : 'font-medium text-saphir'}">${res.guest}</span>
+                    </td>
+                    <td class="px-6 py-4 text-xs text-gray-400 font-medium">
+                        ${res.start} <i class="fa-solid fa-arrow-right mx-2 text-[10px] text-gold"></i> ${res.end}
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter 
+                        ${isLibre ? 'bg-green-100 text-green-700' : 'bg-saphir-dark text-gold border border-gold/20'}">
+                            ${isLibre ? 'Immédiat' : 'Libre le ' + res.end}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-center flex justify-center space-x-3">
+                        ${isLibre ? '' : `
+                            <button onclick="editReservation(${index})" class="text-gold hover:text-saphir transition-colors" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="deleteReservation(${index})" class="text-red-500 hover:text-red-700 transition-colors" title="Supprimer"><i class="fa-solid fa-trash-can"></i></button>
+                        `}
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // --- FONCTIONS POUR LA MODALE DE STATISTIQUES ---
+        function openStatsModal(type) {
+            const modal = document.getElementById('statsDetailsModal');
+            const title = document.getElementById('statsModalTitle');
+            const textContent = document.getElementById('statsTextContent');
+            const canvas = document.getElementById('statsDetailChart').getContext('2d');
+
+            // Reset modale
+            if(currentDetailChart) currentDetailChart.destroy();
+            textContent.innerHTML = "";
+            modal.classList.remove('hidden');
+
+            let chartConfig = {
+                type: 'line',
+                data: {},
+                options: { responsive: true, maintainAspectRatio: false }
+            };
+
+            switch(type) {
+                case 'booking':
+                    title.innerText = "Analyse : Taux de réservation";
+                    chartConfig.data = {
+                        labels: ['2021', '2022', '2023', '2024'],
+                        datasets: [{
+                            label: 'Réservations Globales (%)',
+                            data: [65, 72, 78, 80],
+                            borderColor: '#c5a059',
+                            backgroundColor: 'rgba(197, 160, 89, 0.1)',
+                            fill: true, tension: 0.4
+                        }]
+                    };
+                    textContent.innerHTML = `<p class="italic">Les réservations ont augmenté de 14% grâce à la nouvelle suite Royalty Signature.</p>`;
+                    break;
+
+                case 'occupancy':
+                    title.innerText = "Analyse : Taux d'Occupation";
+                    chartConfig.type = 'bar';
+                    chartConfig.data = {
+                        labels: ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Juin'],
+                        datasets: [{
+                            label: 'Occupation Mensuelle (%)',
+                            data: [85, 88, 92, 95, 90, 94],
+                            backgroundColor: '#1a2a4d'
+                        }]
+                    };
+                    textContent.innerHTML = `<ul class="list-disc pl-5"><li>Pic d'occupation : Avril (Période Festival).</li><li>Moyenne annuelle : 91.2%.</li></ul>`;
+                    break;
+
+                case 'requests':
+                    title.innerText = "Flux : Nouvelles Demandes";
+                    document.getElementById('statsChartContainer').classList.add('hidden'); // On cache le graph pour cette stat
+                    textContent.innerHTML = `
+                        <div class="space-y-3">
+                            <div class="p-3 bg-gray-50 border-l-4 border-gold flex justify-between items-center">
+                                <div><p class="font-bold">Famille Al-Thani</p><p class="text-xs">Privatisation Penthouse - Juillet</p></div>
+                                <span class="text-[10px] bg-gold/20 text-gold-dark px-2 py-1 rounded">Site Web</span>
+                            </div>
+                            <div class="p-3 bg-gray-50 border-l-4 border-gold flex justify-between items-center">
+                                <div><p class="font-bold">Agence LuxuryTravel</p><p class="text-xs">Transfert Jet Privé + 3 Suites</p></div>
+                                <span class="text-[10px] bg-saphir/20 text-saphir px-2 py-1 rounded">Conciergerie</span>
+                            </div>
+                             <div class="p-3 bg-gray-50 border-l-4 border-gold flex justify-between items-center">
+                                <div><p class="font-bold">Jean-Luc Moreau</p><p class="text-xs">Demande de menu Vegan - Restaurant</p></div>
+                                <span class="text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded">WhatsApp</span>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'satisfaction':
+                    title.innerText = "Qualité : Satisfaction Client";
+                    chartConfig.type = 'doughnut';
+                    chartConfig.data = {
+                        labels: ['5 Étoiles', '4 Étoiles', '3 Étoiles'],
+                        datasets: [{
+                            data: [280, 50, 10],
+                            backgroundColor: ['#c5a059', '#1a2a4d', '#e5e7eb']
+                        }]
+                    };
+                    textContent.innerHTML = `
+                        <div class="mt-4 border-t pt-4">
+                            <p class="font-bold mb-2">Dernier commentaire :</p>
+                            <p class="italic text-xs">"Une expérience hors du temps, le service de majordome dans la suite Royalty est impeccable." - <span class="font-bold text-gold">Mr De Silva</span></p>
+                        </div>
+                    `;
+                    break;
+            }
+
+            if(type !== 'requests') {
+                document.getElementById('statsChartContainer').classList.remove('hidden');
+                currentDetailChart = new Chart(canvas, chartConfig);
+            }
+        }
+
+        function closeStatsModal() {
+            document.getElementById('statsDetailsModal').classList.add('hidden');
+        }
+
+        // --- AJOUT DES FONCTIONNALITÉS ADMIN (MODIFICATION, CRÉATION, SUPPRESSION) ---
+        function openReservationModal() {
+            document.getElementById('form-index').value = "";
+            document.getElementById('reservationForm').reset();
+            document.getElementById('reservationFormModal').classList.remove('hidden');
+        }
+
+        function closeReservationModal() {
+            document.getElementById('reservationFormModal').classList.add('hidden');
+        }
+
+        function editReservation(index) {
+            const res = reservationsList[index];
+            const nameParts = res.guest.split(' ');
+            document.getElementById('form-index').value = index;
+            document.getElementById('form-firstname').value = nameParts[0] || "";
+            document.getElementById('form-lastname').value = nameParts.slice(1).join(' ') || "";
+            document.getElementById('form-suite-select').value = res.suite;
+            document.getElementById('form-start').value = res.start;
+            document.getElementById('form-end').value = res.end;
+            document.getElementById('form-phone').value = res.phone;
+            document.getElementById('form-email').value = res.email;
+            document.getElementById('reservationFormModal').classList.remove('hidden');
+        }
+
+        function deleteReservation(index) {
+            if (confirm("Confirmez-vous l'annulation du séjour pour " + reservationsList[index].guest + " ?")) {
+                reservationsList[index] = { suite: reservationsList[index].suite, guest: "Libre", start: "-", end: "-", phone: "-", email: "-", status: "Libre" };
+                renderReservationsTable();
+            }
+        }
+
+        document.getElementById('reservationForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const index = document.getElementById('form-index').value;
+            const firstname = document.getElementById('form-firstname').value.trim();
+            const lastname = document.getElementById('form-lastname').value.trim();
+            const suite = document.getElementById('form-suite-select').value;
+            const start = document.getElementById('form-start').value;
+            const end = document.getElementById('form-end').value;
+            const phone = document.getElementById('form-phone').value;
+            const email = document.getElementById('form-email').value;
+
+            const updatedData = {
+                suite: suite,
+                guest: firstname + " " + lastname,
+                start: start,
+                end: end,
+                phone: phone,
+                email: email,
+                status: "Occupé"
+            };
+
+            if (index !== "") {
+                reservationsList[index] = updatedData;
+            } else {
+                reservationsList.unshift(updatedData); // Ajoute la nouvelle en haut
+            }
+
+            closeReservationModal();
+            renderReservationsTable();
+        });
+
+        // --- LOGIQUE DE RECHERCHE DANS LE HEADER ---
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                const searchTerm = e.target.value.toLowerCase().trim();
+                if (searchTerm === "") return;
+
+                // On cherche le client dans la liste (ignorer "Libre")
+                const foundClient = reservationsList.find(c => 
+                    c.guest !== "Libre" && c.guest.toLowerCase().includes(searchTerm)
+                );
+
+                if (foundClient) {
+                    openClientCardFromData(foundClient);
+                    e.target.value = ""; // Vider la barre après succès
+                } else {
+                    alert("Aucun client trouvé pour : " + e.target.value);
+                }
+            }
+        });
+
+        // --- LOGIQUE DE LA FICHE CLIENT (MODALE) ---
+        function openClientCard(rowElement) {
+            const d = rowElement.dataset;
+            openClientCardFromData({
+                guest: d.firstname + " " + d.lastname,
+                suite: d.suite,
+                phone: d.phone,
+                email: d.email
+            });
+        }
+
+        function openClientCardFromData(data) {
+            document.getElementById('m-full-name').innerText = data.guest;
+            document.getElementById('m-firstname').innerText = data.guest.split(' ')[0];
+            document.getElementById('m-lastname').innerText = data.guest.split(' ')[1] || "";
+            document.getElementById('m-suite').innerText = data.suite;
+            document.getElementById('m-phone').innerText = data.phone;
+            document.getElementById('m-email').innerText = data.email;
+            document.getElementById('clientModal').classList.remove('hidden');
+        }
+
+        function closeClientCard() {
+            document.getElementById('clientModal').classList.add('hidden');
+        }
+
+        // --- LOGIQUE DE NAVIGATION (SPA) ---
+        function switchSection(sectionName, element) {
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            const targetSection = document.getElementById('section-' + sectionName);
+            if(targetSection) targetSection.classList.add('active');
+
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            element.classList.add('active');
+
+            const sectionTitles = {
+                'overview': 'Conciergerie',
+                'residences': 'Gestion des Résidences',
+                'reservations': 'Registre des Séjours',
+                'settings': 'Configuration Admin'
+            };
+            document.getElementById('current-page-title').innerText = sectionTitles[sectionName];
+
+            if(sectionName === 'reservations') renderReservationsTable();
+            if(window.innerWidth < 768) toggleSidebar();
+        }
+
+        // --- LOGIQUE SIDEBAR MOBILE ---
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const openBtn = document.getElementById('openSidebar');
+        function toggleSidebar() {
+            sidebar.classList.toggle('sidebar-hidden');
+            overlay.classList.toggle('hidden');
+        }
+        openBtn.addEventListener('click', toggleSidebar);
+        overlay.addEventListener('click', toggleSidebar);
+
+        // Initialisation
+        renderReservationsTable();
+    </script>
+</body>
+</html>

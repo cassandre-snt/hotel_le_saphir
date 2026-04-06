@@ -11,3 +11,8 @@ function generateRandomPassword($longueur = 16) {
 
     return $motDePasse;
 }
+
+function formatShortDate($dateString) {
+    $date = new DateTime($dateString);
+    return ucfirst(mb_strtolower(trim($date->format('d M'))));
+}
